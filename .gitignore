@@ -1,0 +1,46 @@
+# Environment and secrets — never commit
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+secrets/
+credentials/
+
+# Local config overrides (copy from config.local.example.js)
+config.local.js
+
+# Vercel CLI link data (contains project/org tokens)
+.vercel/
+
+# Dependencies and build output
+node_modules/
+dist/
+build/
+.next/
+out/
+
+# OS and editor
+.DS_Store
+Thumbs.db
+desktop.ini
+*.swp
+*.swo
+.idea/
+.vscode/
+*.code-workspace
+
+# Logs and debug
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+
+# Optional local-only assets
+test-qr.png
