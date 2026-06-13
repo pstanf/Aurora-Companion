@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 412 168" preserveAspectRatio="xMidYMid slice">
+  <defs>
+    <linearGradient id="sky" x1="0%" y1="0%" x2="85%" y2="100%">
+      <stop offset="0%" stop-color="#6b7db5"/>
+      <stop offset="38%" stop-color="#a89bc4"/>
+      <stop offset="68%" stop-color="#e8b896"/>
+      <stop offset="100%" stop-color="#f5c4a8"/>
+    </linearGradient>
+    <radialGradient id="sunGlow" cx="78%" cy="92%" r="52%">
+      <stop offset="0%" stop-color="#ffd4b0" stop-opacity="0.95"/>
+      <stop offset="45%" stop-color="#e07a52" stop-opacity="0.45"/>
+      <stop offset="100%" stop-color="#e07a52" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="cloudA" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#ffffff" stop-opacity="0.28"/>
+      <stop offset="100%" stop-color="#ffffff" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="wave" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#1a237e" stop-opacity="0"/>
+      <stop offset="100%" stop-color="#0c134f" stop-opacity="0.35"/>
+    </linearGradient>
+  </defs>
+  <rect width="412" height="168" fill="url(#sky)"/>
+  <rect width="412" height="168" fill="url(#sunGlow)"/>
+  <ellipse cx="300" cy="118" rx="95" ry="32" fill="url(#cloudA)"/>
+  <ellipse cx="220" cy="98" rx="70" ry="24" fill="url(#cloudA)" opacity="0.85"/>
+  <ellipse cx="360" cy="88" rx="55" ry="20" fill="url(#cloudA)" opacity="0.6"/>
+  <path fill="url(#wave)" d="M0 128 Q103 108 206 122 T412 116 V168 H0 Z"/>
+  <path fill="#0c134f" fill-opacity="0.12" d="M0 142 Q154 124 308 138 T412 132 V168 H0 Z"/>
+</svg>
