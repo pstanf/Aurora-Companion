@@ -105,9 +105,71 @@ function go(name){
 function toast(msg){
   const t = document.getElementById('toast');
   t.textContent = msg;
+  t.classList.remove('toast-update');
+  t.style.pointerEvents = '';
+  t.onclick = null;
   t.classList.add('show');
   clearTimeout(t._h);
   t._h = setTimeout(() => t.classList.remove('show'), 2600);
+}
+
+function applyAppUpdate(){
+  navigator.serviceWorker.getRegistration().then(reg => {
+    if(reg && reg.waiting) reg.waiting.postMessage({ type: 'SKIP_WAITING' });
+    else window.location.reload();
+  });
+}
+
+function showAppUpdatePrompt(){
+  if(showAppUpdatePrompt.shown) return;
+  showAppUpdatePrompt.shown = true;
+  const t = document.getElementById('toast');
+  clearTimeout(t._h);
+  t.textContent = 'Update ready — tap to refresh';
+  t.classList.add('show', 'toast-update');
+  t.style.pointerEvents = 'auto';
+  t.onclick = () => {
+    t.classList.remove('show', 'toast-update');
+    t.style.pointerEvents = '';
+    t.onclick = null;
+    applyAppUpdate();
+  };
+}
+
+function initServiceWorker(){
+  if(!('serviceWorker' in navigator)) return;
+
+  let refreshing = false;
+  navigator.serviceWorker.addEventListener('controllerchange', () => {
+    if(refreshing) return;
+    refreshing = true;
+    window.location.reload();
+  });
+
+  const watchForWaiting = reg => {
+    if(reg.waiting && navigator.serviceWorker.controller) showAppUpdatePrompt();
+    reg.addEventListener('updatefound', () => {
+      const worker = reg.installing;
+      if(!worker) return;
+      worker.addEventListener('statechange', () => {
+        if(worker.state === 'installed' && navigator.serviceWorker.controller) showAppUpdatePrompt();
+      });
+    });
+  };
+
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('sw.js')
+      .then(reg => {
+        watchForWaiting(reg);
+        reg.update().catch(() => {});
+      })
+      .catch(() => {});
+  });
+
+  document.addEventListener('visibilitychange', () => {
+    if(document.visibilityState !== 'visible') return;
+    navigator.serviceWorker.getRegistration().then(reg => reg && reg.update().catch(() => {}));
+  });
 }
 
 /* ───────── Welcome ───────── */
@@ -1162,9 +1224,7 @@ function bootApp(){
     if(document.getElementById('screen-home')?.classList.contains('active')) renderHome();
   });
 
-  if('serviceWorker' in navigator){
-    window.addEventListener('load', () => navigator.serviceWorker.register('sw.js'));
-  }
+  if('serviceWorker' in navigator) initServiceWorker();
 }
 
 if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded', bootApp);

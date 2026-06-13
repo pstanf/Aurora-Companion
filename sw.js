@@ -1,4 +1,4 @@
-const CACHE = 'aurora-companion-v77';
+const CACHE = 'aurora-companion-v78';
 const CORE_ASSETS = [
   './',
   './index.html',
@@ -22,6 +22,45 @@ const OPTIONAL_ASSETS = [
   './sounds/sound-bath.mp3',
   './sounds/meditation.mp3'
 ];
+const NETWORK_FIRST = new Set([
+  './index.html',
+  './app.js',
+  './ui.js',
+  './styles.css',
+  './config.js',
+  './journal-crypto.js',
+  './audio.js',
+  './daily-meditations.js',
+  './manifest.webmanifest'
+]);
+
+function isNetworkFirst(url){
+  const path = url.pathname.replace(/\/$/, '/index.html');
+  const rel = path.startsWith('/') ? '.' + path : './' + path;
+  if(NETWORK_FIRST.has(rel)) return true;
+  return url.pathname.endsWith('.html');
+}
+
+function networkFirst(request){
+  return fetch(request)
+    .then(res => {
+      if(res.ok) caches.open(CACHE).then(c => c.put(request, res.clone()));
+      return res;
+    })
+    .catch(() => caches.match(request));
+}
+
+function cacheFirst(request){
+  return caches.match(request).then(cached => {
+    const fresh = fetch(request)
+      .then(res => {
+        if(res.ok) caches.open(CACHE).then(c => c.put(request, res.clone()));
+        return res;
+      })
+      .catch(() => cached);
+    return cached || fresh;
+  });
+}
 
 self.addEventListener('install', e => {
   e.waitUntil(
@@ -29,7 +68,6 @@ self.addEventListener('install', e => {
       .then(c => c.addAll(CORE_ASSETS))
       .then(() => caches.open(CACHE))
       .then(c => Promise.all(OPTIONAL_ASSETS.map(u => c.add(u).catch(() => {}))))
-      .then(() => self.skipWaiting())
   );
 });
 
@@ -41,20 +79,14 @@ self.addEventListener('activate', e => {
   );
 });
 
-// Same-origin requests: serve from cache, refresh in the background.
-// Cross-origin (e.g. the Google Sheet feed) is handled by the app itself.
+self.addEventListener('message', e => {
+  if(e.data && e.data.type === 'SKIP_WAITING') self.skipWaiting();
+});
+
+// App shell: network-first so updates land quickly. Images/audio: cache-first for offline.
 self.addEventListener('fetch', e => {
   const url = new URL(e.request.url);
-  if (e.request.method !== 'GET' || url.origin !== location.origin) return;
-  e.respondWith(
-    caches.match(e.request).then(cached => {
-      const fresh = fetch(e.request)
-        .then(res => {
-          if (res.ok) caches.open(CACHE).then(c => c.put(e.request, res.clone()));
-          return res;
-        })
-        .catch(() => cached);
-      return cached || fresh;
-    })
-  );
+  if(e.request.method !== 'GET' || url.origin !== location.origin) return;
+  if(url.pathname.endsWith('/sw.js')) return;
+  e.respondWith(isNetworkFirst(url) ? networkFirst(e.request) : cacheFirst(e.request));
 });
