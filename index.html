@@ -41,7 +41,7 @@
     </div>
 
     <input id="nameInput" type="text" maxlength="24" placeholder="What should we call you?" autocomplete="off">
-    <button class="btn btn-navy" style="min-width:220px" data-action="welcome-finish">Begin Gently</button>
+    <button class="btn btn-grounded" data-action="welcome-finish">Begin Gently</button>
     <p class="note" id="welcomeClinicalNote">This companion supports — but never replaces — care from a licensed clinician.</p>
     <p class="note privacy-note" id="welcomePrivacyNote"></p>
   </div>
@@ -138,7 +138,7 @@
     </div>
 
     <div class="section">
-      <button class="btn btn-primary btn-block" id="saveCheckin" data-action="checkin-save" disabled>Save Check-In</button>
+      <button class="btn btn-grounded btn-block" id="saveCheckin" data-action="checkin-save" disabled>Save Check-In</button>
       <p class="privacy-inline" id="checkinPrivacyNote"></p>
     </div>
 
@@ -146,7 +146,10 @@
       <div class="card support-card">
         <h3>It sounds like today is heavy.</h3>
         <p>You don't have to carry it alone. The Aurora team is just a phone call away — reach out and we'll walk through it together.</p>
-        <a class="btn btn-navy" href="tel:9787057304" style="text-decoration:none">Call Aurora</a>
+        <a class="btn support-call" href="tel:9787057304">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.8 19.8 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.8 19.8 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.12.89.33 1.76.62 2.6a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.48-1.19a2 2 0 0 1 2.11-.45c.84.29 1.71.5 2.6.62A2 2 0 0 1 22 16.92z"/></svg>
+          Call Aurora
+        </a>
         <button type="button" class="btn btn-ghost btn-block" style="margin-top:10px" data-action="nav" data-screen="calm">Open my calm plan</button>
       </div>
     </div>
