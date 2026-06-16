@@ -142,11 +142,18 @@
       <p class="privacy-inline" id="checkinPrivacyNote"></p>
     </div>
 
-    <div class="section" id="supportNudge" style="display:none">
+    <div class="section" id="supportNudge" hidden>
       <div class="card support-card">
-        <h3>It sounds like today is heavy.</h3>
-        <p>You don't have to carry it alone. The Aurora team is just a phone call away — reach out and we'll walk through it together.</p>
-        <a class="btn btn-navy" href="tel:9787057304" style="text-decoration:none">Call Aurora</a>
+        <h3 id="supportNudgeTitle"></h3>
+        <p id="supportNudgeBody"></p>
+        <div id="support988Block" hidden>
+          <p class="support-lifeline-note" id="support988Note"></p>
+          <div class="support-actions">
+            <a class="btn btn-navy" href="tel:988" id="support988Call">Call 988</a>
+            <a class="btn btn-ghost" href="sms:988" id="support988Text">Text 988</a>
+          </div>
+        </div>
+        <a class="btn btn-navy btn-block" id="supportAuroraCall" href="tel:9787057304" style="text-decoration:none;margin-top:10px">Call Aurora</a>
         <button type="button" class="btn btn-ghost btn-block" style="margin-top:10px" data-action="nav" data-screen="calm">Open my calm plan</button>
       </div>
     </div>
@@ -436,6 +443,18 @@
       <div class="kicker">Connect with Aurora</div>
       <h1>Reaching out is a brave first step</h1>
       <p class="sub">We're here to listen and help you find care that feels right.</p>
+    </div>
+
+    <div class="section">
+      <div class="card support-lifeline">
+        <h3 id="supportConnectTitle"></h3>
+        <p id="supportConnectBody"></p>
+        <div class="support-actions">
+          <a class="btn btn-navy" href="tel:988" id="supportConnectCall">Call 988</a>
+          <a class="btn btn-ghost" href="sms:988" id="supportConnectText">Text 988</a>
+        </div>
+        <p class="support-emergency-note" id="supportConnectEmergency"></p>
+      </div>
     </div>
 
     <div class="section">

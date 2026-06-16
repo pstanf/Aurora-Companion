@@ -35,6 +35,22 @@ function applySiteBranding(){
   const wlead = document.getElementById('welcomeLead');
   if(wlead) wlead.textContent = SITE.welcomeLead;
   applyPrivacyCopy();
+  applySupportCopy();
+}
+
+function applySupportCopy(){
+  const s = SITE.support;
+  if(!s) return;
+  const set = (id, text) => { const el = document.getElementById(id); if(el && text) el.textContent = text; };
+  set('supportConnectTitle', s.connectTitle);
+  set('supportConnectBody', s.connectBody);
+  set('supportConnectEmergency', s.connectEmergency);
+  set('support988Note', s.lifelineNote);
+  const aurora = document.getElementById('supportAuroraCall');
+  if(aurora && SITE.phone){
+    aurora.href = 'tel:' + SITE.phone;
+    aurora.textContent = 'Call Aurora';
+  }
 }
 
 function applyPrivacyCopy(){

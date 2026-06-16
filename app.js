@@ -93,7 +93,6 @@ function go(name){
   if(name === 'daily') renderDaily();
   if(name === 'calm') renderCalm();
   if(name === 'checkin'){
-    document.getElementById('supportNudge').style.display = 'none';
     syncCheckinForm();
     renderMoodTrend(store.get('checkins', []));
     renderCalmTeaser();
@@ -395,6 +394,38 @@ function syncCheckinForm(){
     saveBtn.disabled = !selMood;
     saveBtn.textContent = today ? 'Update Check-In' : 'Save Check-In';
   }
+  syncCheckinSupportNudge();
+}
+
+function showSupportNudge(mood){
+  const s = SITE.support;
+  const nudge = document.getElementById('supportNudge');
+  const block988 = document.getElementById('support988Block');
+  if(!nudge || !s) return;
+
+  const title = document.getElementById('supportNudgeTitle');
+  const body = document.getElementById('supportNudgeBody');
+  if(mood === 1){
+    if(title) title.textContent = s.checkinStrugglingTitle;
+    if(body) body.textContent = s.checkinStrugglingBody;
+    if(block988) block988.hidden = false;
+  }else{
+    if(title) title.textContent = s.checkinLowTitle;
+    if(body) body.textContent = s.checkinLowBody;
+    if(block988) block988.hidden = true;
+  }
+  nudge.hidden = false;
+}
+
+function syncCheckinSupportNudge(){
+  const today = getTodayCheckin();
+  const nudge = document.getElementById('supportNudge');
+  if(!nudge) return;
+  if(today && today.mood <= 2){
+    showSupportNudge(today.mood);
+  }else{
+    nudge.hidden = true;
+  }
 }
 
 function saveCheckin(){
@@ -423,21 +454,20 @@ function saveCheckin(){
   toast(msgs[selMood]);
 
   if(selMood <= 2){
-    document.getElementById('supportNudge').style.display = 'block';
     renderMoodTrend(checkins);
     renderHome();
+    syncCheckinForm();
   }else{
+    document.getElementById('supportNudge').hidden = true;
     go('home');
+    selMood = null;
+    selFeelings.clear();
+    document.getElementById('checkinNote').value = '';
+    document.querySelectorAll('.mood-opt').forEach(x => x.classList.remove('sel'));
+    document.querySelectorAll('.chip').forEach(x => x.classList.remove('sel'));
+    document.getElementById('saveCheckin').disabled = true;
+    document.getElementById('saveCheckin').textContent = 'Save Check-In';
   }
-
-  // reset form
-  selMood = null;
-  selFeelings.clear();
-  document.getElementById('checkinNote').value = '';
-  document.querySelectorAll('.mood-opt').forEach(x => x.classList.remove('sel'));
-  document.querySelectorAll('.chip').forEach(x => x.classList.remove('sel'));
-  document.getElementById('saveCheckin').disabled = true;
-  document.getElementById('saveCheckin').textContent = 'Save Check-In';
 }
 
 /* ───────── Tools: tabs ───────── */

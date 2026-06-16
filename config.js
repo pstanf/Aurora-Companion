@@ -51,7 +51,17 @@ const SITE = {
     journalSub: 'Encrypted on this device — only you can unlock it.',
     connectTitle: 'Your data & privacy',
     connectBody: 'Aurora Companion does not collect, access, transmit, or store your check-ins, journal entries, calm plans, or other personal content. Journal entries are encrypted on your device with a passcode you choose. We cannot recover lost passcodes or journal content. Other information stays on your device only. Data does not sync to other phones or computers. You are responsible for securing the device you use.',
-    disclaimer: 'Aurora Companion offers supportive tools and is not a medical device, diagnosis, or substitute for professional mental health care. If you are experiencing an emergency, call 911. Aurora is not responsible for personal content stored on your device or for access by others who use or unlock your device.'
+    disclaimer: 'Aurora Companion offers supportive tools and is not a medical device, diagnosis, or substitute for professional mental health care. For mental health support, call or text 988. If you are in immediate danger, call 911. Aurora is not responsible for personal content stored on your device or for access by others who use or unlock your device.'
+  },
+  support: {
+    checkinStrugglingTitle: 'It sounds like today is heavy.',
+    checkinStrugglingBody: 'You do not have to carry this alone. Free, confidential support is available 24/7 — and the Aurora team is here for you too.',
+    checkinLowTitle: 'Thank you for checking in.',
+    checkinLowBody: 'Hard days happen. The Aurora team is just a phone call away whenever you want to reach out.',
+    lifelineNote: 'The 988 Suicide & Crisis Lifeline — call or text 988.',
+    connectTitle: 'Support when you need it',
+    connectBody: 'Free, confidential support is available 24/7. Call or text 988 to connect with the 988 Suicide & Crisis Lifeline.',
+    connectEmergency: 'If you are in immediate danger, call 911.'
   }
 };
 
