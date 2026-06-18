@@ -18,6 +18,48 @@
 
 <div class="phone">
 
+  <!-- ════════ PRIVACY & SAFETY NOTICE ════════ -->
+  <div class="screen" id="screen-privacy">
+    <div class="privacy-notice-scroll">
+      <div class="privacy-notice-head">
+        <img src="aurora-emblem.png" alt="" class="privacy-notice-emblem" width="48" height="48">
+        <div class="kicker" id="privacyNoticeKicker">Before you begin</div>
+        <h1 id="privacyNoticeTitle"></h1>
+        <p class="sub" id="privacyNoticeSubtitle"></p>
+      </div>
+
+      <p class="privacy-notice-intro" id="privacyNoticeIntro"></p>
+
+      <div class="card privacy-notice-card">
+        <p class="privacy-notice-card-label">Your data on this device</p>
+        <ul class="privacy-notice-list" id="privacyNoticeList"></ul>
+      </div>
+
+      <div class="card privacy-callout privacy-callout-wellness">
+        <p id="privacyNoticeWellness"></p>
+      </div>
+
+      <div class="card privacy-callout privacy-callout-emergency">
+        <p id="privacyNoticeEmergency"></p>
+      </div>
+
+      <p class="privacy-notice-fine" id="privacyNoticeFine"></p>
+      <p class="privacy-notice-version" id="privacyNoticeVersion"></p>
+    </div>
+
+    <div class="privacy-notice-footer" id="privacyAcceptBlock">
+      <label class="privacy-accept-label">
+        <input type="checkbox" id="privacyAcceptCheck">
+        <span id="privacyAcceptLabel"></span>
+      </label>
+      <button type="button" class="btn btn-navy btn-block" id="privacyAcceptBtn" data-action="privacy-accept" disabled>I understand — continue</button>
+    </div>
+
+    <div class="privacy-notice-footer" id="privacyReviewBlock" hidden>
+      <button type="button" class="btn btn-navy btn-block" data-action="privacy-close">Back to Connect</button>
+    </div>
+  </div>
+
   <!-- ════════ WELCOME / ONBOARDING ════════ -->
   <div class="screen" id="screen-welcome">
     <div class="welcome-logo"><img src="aurora-emblem.png" alt="Aurora logo"></div>
@@ -536,6 +578,7 @@
       <h2>Your data &amp; privacy <span class="dotline"></span></h2>
       <div class="card privacy-notice" id="privacyCard">
         <p id="privacyCardBody"></p>
+        <button type="button" class="btn btn-ghost btn-block privacy-review-link" data-action="privacy-review" id="privacyReviewLink">Read full privacy &amp; safety notice</button>
       </div>
     </div>
 

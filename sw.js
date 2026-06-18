@@ -1,4 +1,4 @@
-const CACHE = 'aurora-companion-v82';
+const CACHE = 'aurora-companion-v84';
 const CORE_ASSETS = [
   './',
   './index.html',

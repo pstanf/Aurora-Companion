@@ -100,7 +100,7 @@ body{
   padding-bottom:24px;
   scrollbar-width:thin;
 }
-.screen.active{
+.screen.active:not(#screen-welcome):not(#screen-privacy){
   display:block;
   animation:fadeUp .4s var(--ease);
 }
@@ -886,6 +886,74 @@ textarea:focus{
 }
 #screen-welcome .privacy-note{max-width:34ch;margin-top:10px;}
 
+/* ── Privacy & safety notice ── */
+#screen-privacy{
+  display:none;position:absolute;inset:0;z-index:45;
+  flex-direction:column;background:var(--cream);
+}
+#screen-privacy.active{display:flex;animation:fadeUp .35s var(--ease);}
+.privacy-notice-scroll{
+  flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;
+  padding:28px 22px 16px;
+}
+.privacy-notice-head{text-align:center;margin-bottom:18px;}
+.privacy-notice-emblem{
+  width:52px;height:52px;border-radius:50%;margin:0 auto 12px;
+  box-shadow:var(--shadow-sm);background:var(--white);padding:4px;
+}
+#screen-privacy .kicker{color:var(--navy-soft);}
+#screen-privacy h1{
+  font-family:'Playfair Display',serif;font-size:1.35rem;color:var(--navy);
+  margin-bottom:6px;line-height:1.25;
+}
+#screen-privacy .sub{font-size:.78rem;color:var(--ink-soft);max-width:28ch;margin:0 auto;}
+.privacy-notice-intro{
+  font-size:.76rem;line-height:1.65;color:var(--ink-soft);margin-bottom:16px;text-align:center;
+}
+.privacy-notice-card{margin-bottom:12px;padding:16px 18px;}
+.privacy-notice-card-label{
+  font-size:.68rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;
+  color:var(--navy-soft);margin-bottom:10px;
+}
+.privacy-notice-list{
+  margin:0;padding:0 0 0 16px;font-size:.74rem;line-height:1.6;color:var(--ink-soft);
+}
+.privacy-notice-list li{margin-bottom:8px;}
+.privacy-notice-list li:last-child{margin-bottom:0;}
+.privacy-callout{
+  margin-bottom:12px;padding:14px 16px;border-radius:var(--radius-md);
+  font-size:.74rem;line-height:1.6;
+}
+.privacy-callout-wellness{
+  background:linear-gradient(145deg,#f5f0fb,#fdf8f4);
+  border:1px solid rgba(139,90,158,0.12);
+  color:var(--ink-soft);
+}
+.privacy-callout-emergency{
+  background:linear-gradient(145deg,#eef1fb,#fdf6f0);
+  border:1px solid rgba(26,35,126,0.08);
+  color:var(--ink-soft);
+}
+.privacy-notice-fine{
+  font-size:.66rem;line-height:1.55;color:var(--ink-muted);margin:14px 0 8px;
+}
+.privacy-notice-version{
+  font-size:.62rem;color:var(--ink-muted);text-align:center;margin-bottom:8px;
+}
+.privacy-notice-footer{
+  flex-shrink:0;padding:14px 18px calc(14px + env(safe-area-inset-bottom));
+  background:var(--white);border-top:1px solid rgba(26,35,126,0.06);
+  box-shadow:0 -4px 20px rgba(12,19,79,0.06);
+}
+.privacy-accept-label{
+  display:flex;gap:10px;align-items:flex-start;cursor:pointer;
+  font-size:.72rem;line-height:1.5;color:var(--ink-soft);margin-bottom:12px;
+}
+.privacy-accept-label input{
+  margin-top:2px;width:18px;height:18px;flex-shrink:0;accent-color:var(--navy);
+}
+.privacy-review-link{margin-top:12px;font-size:.74rem;}
+
 .journal-lock-card h3{font-family:'Playfair Display',serif;font-size:1.15rem;font-weight:600;color:var(--navy);margin:6px 0 10px;}
 .journal-lock-card p{font-size:.74rem;line-height:1.6;color:var(--ink-soft);margin-bottom:14px;}
 .journal-lock-form{display:contents;}
@@ -912,6 +980,7 @@ nav{
   box-shadow:0 -4px 24px rgba(12,19,79,0.04);
 }
 #screen-welcome.active ~ nav{display:none;}
+#screen-privacy.active ~ nav{display:none;}
 nav button{
   border:none;background:none;cursor:pointer;
   display:flex;flex-direction:column;align-items:center;gap:3px;

@@ -36,6 +36,30 @@ function applySiteBranding(){
   if(wlead) wlead.textContent = SITE.welcomeLead;
   applyPrivacyCopy();
   applySupportCopy();
+  applyPrivacyNoticeCopy();
+}
+
+function applyPrivacyNoticeCopy(){
+  const p = SITE.privacy;
+  if(!p || !p.noticeVersion) return;
+  const set = (id, text) => { const el = document.getElementById(id); if(el && text) el.textContent = text; };
+  set('privacyNoticeTitle', p.noticeTitle);
+  set('privacyNoticeSubtitle', p.noticeSubtitle);
+  set('privacyNoticeIntro', p.noticeIntro);
+  set('privacyNoticeWellness', p.noticeWellness);
+  set('privacyNoticeEmergency', p.noticeEmergency);
+  set('privacyNoticeFine', p.noticeFinePrint);
+  set('privacyNoticeVersion', 'Privacy notice v' + p.noticeVersion + ' · Last updated ' + p.noticeUpdated);
+  set('privacyAcceptLabel', p.noticeAcceptLabel);
+  const acceptBtn = document.getElementById('privacyAcceptBtn');
+  if(acceptBtn && p.noticeAcceptBtn) acceptBtn.textContent = p.noticeAcceptBtn;
+  const reviewBtn = document.querySelector('#privacyReviewBlock [data-action="privacy-close"]');
+  if(reviewBtn && p.noticeReviewBtn) reviewBtn.textContent = p.noticeReviewBtn;
+  set('privacyReviewLink', p.connectReviewLink);
+  const list = document.getElementById('privacyNoticeList');
+  if(list && p.noticeBullets){
+    list.innerHTML = p.noticeBullets.map(item => '<li>' + item + '</li>').join('');
+  }
 }
 
 function applySupportCopy(){
@@ -101,6 +125,9 @@ const ACTIONS = {
   'daily-today': () => goDailyToday(),
   'daily-fav': () => toggleDailyFavorite(),
   'welcome-finish': () => finishWelcome(),
+  'privacy-accept': () => finishPrivacyAccept(),
+  'privacy-review': () => showPrivacyNotice(true),
+  'privacy-close': () => closePrivacyReview(),
   'install-show': () => showInstallPrompt(),
   'install-dismiss': () => dismissInstall(),
   'install-app': () => installApp(),
@@ -123,6 +150,13 @@ function bindActions(){
   document.getElementById('installBackdrop')?.addEventListener('click', e => {
     if(e.target.id === 'installBackdrop') dismissInstall();
   });
+  const privacyCheck = document.getElementById('privacyAcceptCheck');
+  const privacyBtn = document.getElementById('privacyAcceptBtn');
+  if(privacyCheck && privacyBtn){
+    privacyCheck.addEventListener('change', () => {
+      privacyBtn.disabled = !privacyCheck.checked;
+    });
+  }
   const hzSel = document.getElementById('spiritHzSelect');
   if(hzSel) hzSel.addEventListener('change', () => pickSpiritHz(+hzSel.value));
 }
@@ -132,5 +166,6 @@ Object.assign(window, {
   nextAffirm, nextPrompt, saveEntry, deleteActiveJournalEntry, openJournalEntry,
   submitJournalLock, lockJournalNow, saveCheckin, saveCalmPlan, launchCalmTool,
   toggleCalmTool, shiftDaily, goDailyToday, toggleDailyFavorite, finishWelcome,
-  showInstallPrompt, dismissInstall, installApp, openDailyToday
+  showInstallPrompt, dismissInstall, installApp, openDailyToday,
+  showPrivacyNotice, finishPrivacyAccept, closePrivacyReview, privacyAccepted
 });

@@ -12,6 +12,7 @@ const SITE = {
   pageDescription: 'A gentle daily companion from Aurora — Healing & Recovery for Women.',
   themeColor: '#e07a52',
   homeTagline: 'Small steps, taken gently, become real change.',
+  journalIdleMinutes: 10,
   phone: '9787057304',
   phoneDisplay: '(978) 705-7304',
   email: 'Info@auroraforwomen.com',
@@ -51,7 +52,27 @@ const SITE = {
     journalSub: 'Encrypted on this device — only you can unlock it.',
     connectTitle: 'Your data & privacy',
     connectBody: 'Aurora Companion does not collect, access, transmit, or store your check-ins, journal entries, calm plans, or other personal content. Journal entries are encrypted on your device with a passcode you choose. We cannot recover lost passcodes or journal content. Other information stays on your device only. Data does not sync to other phones or computers. You are responsible for securing the device you use.',
-    disclaimer: 'Aurora Companion offers supportive tools and is not a medical device, diagnosis, or substitute for professional mental health care. For mental health support, call or text 988. If you are in immediate danger, call 911. Aurora is not responsible for personal content stored on your device or for access by others who use or unlock your device.'
+    disclaimer: 'Aurora Companion offers supportive tools and is not a medical device, diagnosis, or substitute for professional mental health care. For mental health support, call or text 988. If you are in immediate danger, call 911. Aurora is not responsible for personal content stored on your device or for access by others who use or unlock your device.',
+    noticeVersion: '1.0',
+    noticeUpdated: 'June 2026',
+    noticeTitle: 'Your privacy & safety come first',
+    noticeSubtitle: 'Please read before you begin',
+    noticeIntro: 'Welcome to the Aurora Companion — a gentle wellness tool from Aurora for Women.',
+    noticeBullets: [
+      'Check-ins, journal entries, calm plans, and notes are stored only on this device in your browser.',
+      'Aurora does not collect, access, receive, store, or transmit your personal entries or mood data.',
+      'This companion is not an electronic health record or medical record system.',
+      'Journal entries can be protected with a passcode you choose. Check-ins and calm plans are not encrypted — anyone who can unlock this device may be able to see them.',
+      'If you clear browser data, uninstall the app, lose your device, or forget your journal passcode, that information cannot be recovered by Aurora.',
+      'You are responsible for securing the phone or computer you use.'
+    ],
+    noticeWellness: 'This app is a wellness companion only. It supports — but never replaces — care from a licensed clinician. It is not crisis intervention or medical advice.',
+    noticeEmergency: 'For mental health support, call or text 988. If you are in immediate danger, call 911. The Aurora team is also here when you want to reach out.',
+    noticeFinePrint: 'By continuing, you acknowledge that your entries stay on your device, Aurora cannot access or recover them, and you accept these terms for this version of the companion.',
+    noticeAcceptLabel: 'I have read this notice. I understand my data stays only on my device, I am responsible for this device\'s security, and this app is a companion tool — not medical treatment.',
+    noticeAcceptBtn: 'I understand — continue',
+    noticeReviewBtn: 'Back to Connect',
+    connectReviewLink: 'Read full privacy & safety notice'
   },
   support: {
     checkinStrugglingTitle: 'It sounds like today is heavy.',

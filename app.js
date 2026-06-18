@@ -79,7 +79,10 @@ function isJournalFlowActive(){
 function go(name){
   ensureDailyContent();
   const wasJournal = isJournalFlowActive();
-  if(wasJournal && name !== 'journal' && name !== 'journal-entry') lockJournal();
+  if(wasJournal && name !== 'journal' && name !== 'journal-entry'){
+    lockJournal();
+    clearTimeout(journalIdleTimer);
+  }
   document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
   document.getElementById('screen-'+name).classList.add('active');
   document.querySelectorAll('nav button').forEach(b => b.classList.toggle('sel', b.dataset.s === name));
@@ -89,7 +92,9 @@ function go(name){
   if(name === 'journal'){
     activeJournalEntryId = null;
     updateJournalAccess();
+    bumpJournalActivity();
   }
+  if(name === 'journal-entry') bumpJournalActivity();
   if(name === 'daily') renderDaily();
   if(name === 'calm') renderCalm();
   if(name === 'checkin'){
@@ -112,6 +117,11 @@ function toast(msg){
   t._h = setTimeout(() => t.classList.remove('show'), 2600);
 }
 
+function checkPendingAppUpdate(reg){
+  if(!reg?.waiting || !navigator.serviceWorker.controller) return;
+  showAppUpdatePrompt();
+}
+
 function applyAppUpdate(){
   navigator.serviceWorker.getRegistration().then(reg => {
     if(reg && reg.waiting) reg.waiting.postMessage({ type: 'SKIP_WAITING' });
@@ -120,9 +130,9 @@ function applyAppUpdate(){
 }
 
 function showAppUpdatePrompt(){
-  if(showAppUpdatePrompt.shown) return;
-  showAppUpdatePrompt.shown = true;
   const t = document.getElementById('toast');
+  if(!t) return;
+  if(t.classList.contains('toast-update') && t.classList.contains('show')) return;
   clearTimeout(t._h);
   t.textContent = 'Update ready — tap to refresh';
   t.classList.add('show', 'toast-update');
@@ -133,6 +143,15 @@ function showAppUpdatePrompt(){
     t.onclick = null;
     applyAppUpdate();
   };
+}
+
+function pollServiceWorkerUpdate(){
+  if(document.visibilityState !== 'visible') return;
+  navigator.serviceWorker.getRegistration().then(reg => {
+    if(!reg) return;
+    reg.update().catch(() => {});
+    checkPendingAppUpdate(reg);
+  });
 }
 
 function initServiceWorker(){
@@ -146,29 +165,79 @@ function initServiceWorker(){
   });
 
   const watchForWaiting = reg => {
-    if(reg.waiting && navigator.serviceWorker.controller) showAppUpdatePrompt();
+    checkPendingAppUpdate(reg);
     reg.addEventListener('updatefound', () => {
       const worker = reg.installing;
       if(!worker) return;
       worker.addEventListener('statechange', () => {
-        if(worker.state === 'installed' && navigator.serviceWorker.controller) showAppUpdatePrompt();
+        if(worker.state === 'installed') checkPendingAppUpdate(reg);
       });
     });
   };
 
-  window.addEventListener('load', () => {
-    navigator.serviceWorker.register('sw.js')
-      .then(reg => {
-        watchForWaiting(reg);
-        reg.update().catch(() => {});
-      })
-      .catch(() => {});
-  });
+  navigator.serviceWorker.register('sw.js')
+    .then(reg => {
+      watchForWaiting(reg);
+      reg.update().catch(() => {});
+    })
+    .catch(() => {});
 
   document.addEventListener('visibilitychange', () => {
-    if(document.visibilityState !== 'visible') return;
-    navigator.serviceWorker.getRegistration().then(reg => reg && reg.update().catch(() => {}));
+    if(document.visibilityState === 'visible') pollServiceWorkerUpdate();
   });
+
+  window.addEventListener('pageshow', () => pollServiceWorkerUpdate());
+
+  setInterval(pollServiceWorkerUpdate, 30 * 60 * 1000);
+}
+
+/* ───────── Privacy notice ───────── */
+function privacyAccepted(){
+  return store.get('privacyAcceptedVersion') === SITE.privacy.noticeVersion;
+}
+
+function showPrivacyNotice(reviewOnly){
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById('screen-privacy').classList.add('active');
+  document.querySelectorAll('nav button').forEach(b => b.classList.remove('sel'));
+  const screen = document.getElementById('screen-privacy');
+  if(screen) screen.scrollTop = 0;
+  const scroll = screen?.querySelector('.privacy-notice-scroll');
+  if(scroll) scroll.scrollTop = 0;
+
+  const needsAccept = !privacyAccepted();
+  const acceptBlock = document.getElementById('privacyAcceptBlock');
+  const reviewBlock = document.getElementById('privacyReviewBlock');
+  const check = document.getElementById('privacyAcceptCheck');
+  const btn = document.getElementById('privacyAcceptBtn');
+  if(acceptBlock) acceptBlock.hidden = reviewOnly && !needsAccept;
+  if(reviewBlock) reviewBlock.hidden = !reviewOnly || needsAccept;
+  if(check) check.checked = false;
+  if(btn) btn.disabled = true;
+}
+
+function finishPrivacyAccept(){
+  store.set('privacyAcceptedVersion', SITE.privacy.noticeVersion);
+  store.set('privacyAcceptedAt', Date.now());
+  const check = document.getElementById('privacyAcceptCheck');
+  if(check) check.checked = false;
+  continueAfterPrivacy();
+}
+
+function closePrivacyReview(){
+  go('connect');
+}
+
+function continueAfterPrivacy(){
+  if(store.get('onboarded', false)){
+    go('home');
+    if(!store.get('installDismissed') && !isStandalone()){
+      setTimeout(maybeShowInstall, 1400);
+    }
+  }else{
+    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+    document.getElementById('screen-welcome').classList.add('active');
+  }
 }
 
 /* ───────── Welcome ───────── */
@@ -841,6 +910,52 @@ function nextAffirm(){
 let journalLockMode = 'unlock';
 let activeJournalEntryId = null;
 let journalEntriesCache = [];
+let journalLastActivity = 0;
+let journalIdleTimer = null;
+
+function journalIdleMs(){
+  return (SITE.journalIdleMinutes || 10) * 60 * 1000;
+}
+
+function bumpJournalActivity(){
+  if(!isJournalUnlocked()) return;
+  journalLastActivity = Date.now();
+  scheduleJournalIdleCheck();
+}
+
+function scheduleJournalIdleCheck(){
+  clearTimeout(journalIdleTimer);
+  if(!isJournalUnlocked() || !isJournalFlowActive()) return;
+  journalIdleTimer = setTimeout(() => {
+    if(!isJournalUnlocked() || !isJournalFlowActive()) return;
+    if(Date.now() - journalLastActivity >= journalIdleMs()){
+      lockJournalFromIdle();
+      return;
+    }
+    scheduleJournalIdleCheck();
+  }, Math.min(journalIdleMs(), 30000));
+}
+
+function lockJournalFromIdle(){
+  if(!isJournalUnlocked()) return;
+  lockJournalNow();
+  toast('Journal locked to protect your privacy.');
+}
+
+function initJournalIdleLock(){
+  const bump = () => bumpJournalActivity();
+  document.getElementById('journalText')?.addEventListener('input', bump);
+  document.getElementById('journalEntryBody')?.addEventListener('input', bump);
+  ['keydown', 'touchstart', 'click', 'scroll'].forEach(ev => {
+    document.getElementById('screen-journal')?.addEventListener(ev, bump, { passive: true });
+    document.getElementById('screen-journal-entry')?.addEventListener(ev, bump, { passive: true });
+  });
+  document.addEventListener('visibilitychange', () => {
+    if(document.visibilityState === 'hidden' && isJournalUnlocked() && isJournalFlowActive()){
+      lockJournalFromIdle();
+    }
+  });
+}
 
 function updateJournalAccess(){
   if(!journalCryptoSupported()){
@@ -912,6 +1027,7 @@ function showJournalContent(unlocked){
   document.getElementById('journalLockPanel').hidden = true;
   document.getElementById('journalContent').hidden = false;
   document.getElementById('journalLockBtn').hidden = !unlocked;
+  if(unlocked) bumpJournalActivity();
 }
 
 async function submitJournalLock(){
@@ -943,9 +1059,12 @@ async function submitJournalLock(){
 
 function lockJournalNow(){
   lockJournal();
+  clearTimeout(journalIdleTimer);
   activeJournalEntryId = null;
   journalEntriesCache = [];
   document.getElementById('journalText').value = '';
+  const entryBody = document.getElementById('journalEntryBody');
+  if(entryBody) entryBody.value = '';
   journalLockMode = 'unlock';
   document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
   document.getElementById('screen-journal').classList.add('active');
@@ -1013,6 +1132,7 @@ function showJournalEntryScreen(){
   screen.classList.add('active');
   screen.scrollTop = 0;
   document.querySelectorAll('nav button').forEach(b => b.classList.toggle('sel', b.dataset.s === 'journal'));
+  bumpJournalActivity();
 }
 
 function backToJournal(){
@@ -1038,6 +1158,7 @@ async function openJournalEntry(id){
   ta.setAttribute('aria-label', 'Journal entry from ' + formatEntryDate(entry));
   showJournalEntryScreen();
   fitJournalField(ta);
+  bumpJournalActivity();
 }
 
 function deleteActiveJournalEntry(){
@@ -1229,6 +1350,7 @@ function bootApp(){
   mountSoundPickers();
   bindActions();
   bindJournalLock();
+  initJournalIdleLock();
   buildCheckin();
   renderGround();
   initLastSeen();
@@ -1237,7 +1359,9 @@ function bootApp(){
   ensureDailyContent();
   updateInstallUI();
 
-  if(store.get('onboarded', false)){
+  if(!privacyAccepted()){
+    showPrivacyNotice(false);
+  }else if(store.get('onboarded', false)){
     go('home');
     if(!store.get('installDismissed') && !isStandalone()){
       setTimeout(maybeShowInstall, 1400);
