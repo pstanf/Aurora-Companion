@@ -46,10 +46,11 @@ function applyPrivacyNoticeCopy(){
   set('privacyNoticeTitle', p.noticeTitle);
   set('privacyNoticeSubtitle', p.noticeSubtitle);
   set('privacyNoticeIntro', p.noticeIntro);
+  set('privacyNoticeBulletsLabel', p.noticeBulletsLabel);
   set('privacyNoticeWellness', p.noticeWellness);
   set('privacyNoticeEmergency', p.noticeEmergency);
   set('privacyNoticeFine', p.noticeFinePrint);
-  set('privacyNoticeVersion', 'Privacy notice v' + p.noticeVersion + ' · Last updated ' + p.noticeUpdated);
+  set('privacyNoticeVersion', 'Privacy Notice v' + p.noticeVersion + ' · Last Updated ' + p.noticeUpdated);
   set('privacyAcceptLabel', p.noticeAcceptLabel);
   const acceptBtn = document.getElementById('privacyAcceptBtn');
   if(acceptBtn && p.noticeAcceptBtn) acceptBtn.textContent = p.noticeAcceptBtn;
