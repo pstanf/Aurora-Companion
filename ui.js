@@ -36,7 +36,6 @@ function applySiteBranding(){
   if(wlead) wlead.textContent = SITE.welcomeLead;
   applyPrivacyCopy();
   applySupportCopy();
-  applyPrivacyNoticeCopy();
 }
 
 function applyPrivacyNoticeCopy(){

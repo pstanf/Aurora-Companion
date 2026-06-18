@@ -1,4 +1,4 @@
-const CACHE = 'aurora-companion-v88';
+const CACHE = 'aurora-companion-v89';
 const CORE_ASSETS = [
   './',
   './index.html',
@@ -8,7 +8,6 @@ const CORE_ASSETS = [
   './journal-crypto.js',
   './app.js',
   './ui.js',
-  './daily-meditations.js',
   './manifest.webmanifest',
   './aurora-logo.png',
   './hero-bg.svg',
@@ -19,10 +18,11 @@ const CORE_ASSETS = [
   './apple-touch-icon.png'
 ];
 const OPTIONAL_ASSETS = [
+  './daily-meditations.js',
   './sounds/sound-bath.mp3',
   './sounds/meditation.mp3'
 ];
-const NETWORK_FIRST = new Set([
+const STALE_WHILE_REVALIDATE = new Set([
   './index.html',
   './app.js',
   './ui.js',
@@ -30,24 +30,32 @@ const NETWORK_FIRST = new Set([
   './config.js',
   './journal-crypto.js',
   './audio.js',
-  './daily-meditations.js',
   './manifest.webmanifest'
 ]);
 
-function isNetworkFirst(url){
+function isStaleWhileRevalidate(url){
   const path = url.pathname.replace(/\/$/, '/index.html');
   const rel = path.startsWith('/') ? '.' + path : './' + path;
-  if(NETWORK_FIRST.has(rel)) return true;
+  if(STALE_WHILE_REVALIDATE.has(rel)) return true;
   return url.pathname.endsWith('.html');
 }
 
-function networkFirst(request){
-  return fetch(request)
-    .then(res => {
-      if(res.ok) caches.open(CACHE).then(c => c.put(request, res.clone()));
-      return res;
+function staleWhileRevalidate(request){
+  return caches.open(CACHE).then(cache =>
+    cache.match(request).then(cached => {
+      const network = fetch(request)
+        .then(res => {
+          if(res.ok) cache.put(request, res.clone());
+          return res;
+        })
+        .catch(() => cached);
+      if(cached){
+        network.catch(() => {});
+        return cached;
+      }
+      return network;
     })
-    .catch(() => caches.match(request));
+  );
 }
 
 function cacheFirst(request){
@@ -83,10 +91,10 @@ self.addEventListener('message', e => {
   if(e.data && e.data.type === 'SKIP_WAITING') self.skipWaiting();
 });
 
-// App shell: network-first so updates land quickly. Images/audio: cache-first for offline.
+// App shell: stale-while-revalidate — instant from cache, refresh in background. Images/audio: cache-first.
 self.addEventListener('fetch', e => {
   const url = new URL(e.request.url);
   if(e.request.method !== 'GET' || url.origin !== location.origin) return;
   if(url.pathname.endsWith('/sw.js')) return;
-  e.respondWith(isNetworkFirst(url) ? networkFirst(e.request) : cacheFirst(e.request));
+  e.respondWith(isStaleWhileRevalidate(url) ? staleWhileRevalidate(e.request) : cacheFirst(e.request));
 });

@@ -95,9 +95,16 @@ function go(name){
     bumpJournalActivity();
   }
   if(name === 'journal-entry') bumpJournalActivity();
+  if(name === 'tools'){
+    mountSoundPickers();
+    initToolSound();
+    initRest();
+    renderGround();
+  }
   if(name === 'daily') renderDaily();
   if(name === 'calm') renderCalm();
   if(name === 'checkin'){
+    buildCheckin();
     syncCheckinForm();
     renderMoodTrend(store.get('checkins', []));
     renderCalmTeaser();
@@ -178,7 +185,7 @@ function initServiceWorker(){
   navigator.serviceWorker.register('sw.js')
     .then(reg => {
       watchForWaiting(reg);
-      reg.update().catch(() => {});
+      setTimeout(() => reg.update().catch(() => {}), 5000);
     })
     .catch(() => {});
 
@@ -186,7 +193,9 @@ function initServiceWorker(){
     if(document.visibilityState === 'visible') pollServiceWorkerUpdate();
   });
 
-  window.addEventListener('pageshow', () => pollServiceWorkerUpdate());
+  window.addEventListener('pageshow', () => {
+    setTimeout(pollServiceWorkerUpdate, 3000);
+  });
 
   setInterval(pollServiceWorkerUpdate, 30 * 60 * 1000);
 }
@@ -197,6 +206,7 @@ function privacyAccepted(){
 }
 
 function showPrivacyNotice(reviewOnly){
+  applyPrivacyNoticeCopy();
   document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
   document.getElementById('screen-privacy').classList.add('active');
   document.querySelectorAll('nav button').forEach(b => b.classList.remove('sel'));
@@ -399,6 +409,7 @@ const selFeelings = new Set();
 
 function buildCheckin(){
   const row = document.getElementById('moodRow');
+  if(!row || row.children.length) return;
   row.innerHTML = '';
   MOODS.forEach(m => {
     const b = document.createElement('button');
@@ -663,6 +674,29 @@ const MONTH_NAMES = ['January','February','March','April','May','June','July','A
 const WEEKDAY_NAMES = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
 
 let dailyViewDate = stripTime(new Date());
+let dailyMeditationsLoad = null;
+
+function loadDailyMeditations(){
+  if(window.AURORA_DAILY) return Promise.resolve();
+  if(dailyMeditationsLoad) return dailyMeditationsLoad;
+  dailyMeditationsLoad = new Promise((resolve, reject) => {
+    const s = document.createElement('script');
+    s.src = 'daily-meditations.js';
+    s.onload = () => resolve();
+    s.onerror = () => {
+      dailyMeditationsLoad = null;
+      reject(new Error('daily-meditations load failed'));
+    };
+    document.head.appendChild(s);
+  });
+  return dailyMeditationsLoad;
+}
+
+function prefetchDailyMeditations(){
+  const run = () => loadDailyMeditations().catch(() => {});
+  if(typeof requestIdleCallback === 'function') requestIdleCallback(run, { timeout: 8000 });
+  else setTimeout(run, 4000);
+}
 
 function stripTime(d){
   return new Date(d.getFullYear(), d.getMonth(), d.getDate());
@@ -685,6 +719,20 @@ function escapeHtml(s){
 }
 
 function renderDaily(){
+  const bodyEl = document.getElementById('dailyBody');
+  if(!window.AURORA_DAILY){
+    if(bodyEl) bodyEl.innerHTML = '<p class="daily-loading">Loading today\'s reflection…</p>';
+    loadDailyMeditations()
+      .then(() => renderDailyContent())
+      .catch(() => {
+        if(bodyEl) bodyEl.innerHTML = '<p>Could not load today\'s reflection. Check your connection and try again.</p>';
+      });
+    return;
+  }
+  renderDailyContent();
+}
+
+function renderDailyContent(){
   const entry = dailyEntryForDate(dailyViewDate);
   const dateEl = document.getElementById('dailyDateLabel');
   const titleEl = document.getElementById('dailyTitle');
@@ -1347,17 +1395,9 @@ async function loadEvents(){
 
 function bootApp(){
   applySiteBranding();
-  mountSoundPickers();
   bindActions();
   bindJournalLock();
-  initJournalIdleLock();
-  buildCheckin();
-  renderGround();
   initLastSeen();
-  initToolSound();
-  initRest();
-  ensureDailyContent();
-  updateInstallUI();
 
   if(!privacyAccepted()){
     showPrivacyNotice(false);
@@ -1370,15 +1410,31 @@ function bootApp(){
     document.getElementById('screen-welcome').classList.add('active');
   }
 
-  loadEvents();
+  const deferBoot = () => {
+    mountSoundPickers();
+    initJournalIdleLock();
+    buildCheckin();
+    renderGround();
+    initToolSound();
+    initRest();
+    ensureDailyContent();
+    updateInstallUI();
+    loadEvents();
+    prefetchDailyMeditations();
+    if('serviceWorker' in navigator) initServiceWorker();
+  };
+
+  if(typeof requestIdleCallback === 'function'){
+    requestIdleCallback(deferBoot, { timeout: 1500 });
+  }else{
+    setTimeout(deferBoot, 0);
+  }
 
   document.addEventListener('visibilitychange', () => {
     if(document.visibilityState !== 'visible') return;
     ensureDailyContent();
     if(document.getElementById('screen-home')?.classList.contains('active')) renderHome();
   });
-
-  if('serviceWorker' in navigator) initServiceWorker();
 }
 
 if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded', bootApp);
