@@ -989,13 +989,13 @@ function showJournalLockPanel(){
   confirm.value = '';
   if(journalLockMode === 'setup'){
     title.textContent = 'Create a journal passcode';
-    desc.textContent = 'Your entries are encrypted on this device with a passcode only you know. Aurora cannot reset it if you forget.';
+    desc.textContent = SITE.privacy.journalLockSetupDesc || 'Your journal entry text will be encrypted on this device with a passcode only you know.';
     confirm.hidden = false;
     passA.placeholder = 'Choose a passcode';
     passA.autocomplete = 'new-password';
   }else{
     title.textContent = 'Unlock your journal';
-    desc.textContent = 'Enter your passcode to read and write entries.';
+    desc.textContent = SITE.privacy.journalLockUnlockDesc || 'Enter your passcode to read and write encrypted journal entries.';
     confirm.hidden = true;
     passA.placeholder = 'Passcode';
     passA.autocomplete = 'current-password';
@@ -1087,7 +1087,7 @@ async function saveEntry(){
   await appendJournalEntry(txt);
   document.getElementById('journalText').value = '';
   renderEntries();
-  toast('Saved — encrypted on this device.');
+  toast(SITE.privacy.journalSavedToast || 'Saved — encrypted on this device.');
 }
 
 function deleteEntry(id){
