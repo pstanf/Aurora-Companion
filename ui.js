@@ -10,6 +10,13 @@ function heroBrandHtml(){
     '</div></div>';
 }
 
+function setContactLink(el, href, text){
+  if(!el || el.tagName !== 'A') return;
+  el.href = href;
+  const label = el.querySelector('.contact-link-label');
+  if(label) label.textContent = text;
+}
+
 function applySiteBranding(){
   document.title = SITE.companionTitle + ' — ' + SITE.tagline;
   const desc = document.querySelector('meta[name="description"]');
@@ -19,14 +26,20 @@ function applySiteBranding(){
   document.querySelectorAll('.hero-brand-mount').forEach(el => { el.innerHTML = heroBrandHtml(); });
   document.querySelectorAll('[data-site-name]').forEach(el => { el.textContent = SITE.name; });
   document.querySelectorAll('[data-site-phone]').forEach(el => {
-    if(el.tagName === 'A'){ el.href = 'tel:' + SITE.phone; el.textContent = SITE.phoneDisplay; }
+    if(el.tagName === 'A') setContactLink(el, 'tel:' + SITE.phone, SITE.phoneDisplay);
     else el.textContent = SITE.phoneDisplay;
   });
   document.querySelectorAll('[data-site-email]').forEach(el => {
-    if(el.tagName === 'A'){ el.href = 'mailto:' + SITE.email; el.textContent = SITE.email; }
+    if(el.tagName === 'A') setContactLink(el, 'mailto:' + SITE.email, SITE.email);
   });
   document.querySelectorAll('[data-site-web]').forEach(el => {
-    if(el.tagName === 'A'){ el.href = SITE.website; el.textContent = SITE.websiteDisplay; }
+    if(el.tagName === 'A') setContactLink(el, SITE.website, SITE.websiteDisplay);
+  });
+  document.querySelectorAll('[data-site-instagram]').forEach(el => {
+    if(el.tagName === 'A') setContactLink(el, SITE.instagram, SITE.instagramDisplay);
+  });
+  document.querySelectorAll('[data-site-facebook]').forEach(el => {
+    if(el.tagName === 'A') setContactLink(el, SITE.facebook, SITE.facebookDisplay);
   });
   const welcome = document.getElementById('welcomeTitle');
   if(welcome) welcome.textContent = SITE.nameUpper;

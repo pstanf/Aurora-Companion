@@ -827,7 +827,13 @@ textarea:focus{
   font-size:.8rem;line-height:1.5;padding:9px 0;
 }
 .contact-card a + a, .contact-card a + .row{border-top:1px solid var(--line);}
-.contact-card svg{width:19px;height:19px;flex-shrink:0;color:var(--orange-deep);margin-top:2px;}
+.contact-card .contact-icon{
+  display:flex;align-items:flex-start;justify-content:center;flex-shrink:0;
+  width:19px;min-width:19px;height:19px;margin-top:2px;overflow:visible;
+}
+.contact-card .contact-icon svg{
+  display:block;width:19px;height:19px;min-width:19px;min-height:19px;color:var(--orange-deep);
+}
 
 .alumni-intro{
   background:linear-gradient(145deg,var(--peach-light),#fdf6f0);
