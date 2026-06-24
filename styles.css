@@ -835,6 +835,31 @@ textarea:focus{
   display:block;width:19px;height:19px;min-width:19px;min-height:19px;color:var(--orange-deep);
 }
 
+/* Portrait-only on phones — overlay when landscape (Safari); manifest + API lock for installed PWAs */
+.orientation-lock{
+  display:none;
+  position:fixed;
+  inset:0;
+  z-index:9999;
+  background:var(--navy);
+  color:var(--white);
+  align-items:center;
+  justify-content:center;
+  padding:32px 24px;
+  text-align:center;
+}
+@media (orientation: landscape) and (max-height: 520px){
+  .orientation-lock{display:flex;}
+}
+.orientation-lock-card{max-width:280px;}
+.orientation-lock svg{
+  display:block;width:52px;height:52px;margin:0 auto 18px;color:var(--peach);
+}
+.orientation-lock p{
+  font-family:'Playfair Display',serif;font-size:1.15rem;line-height:1.4;margin-bottom:8px;
+}
+.orientation-lock-sub{font-size:.82rem;line-height:1.5;color:rgba(255,255,255,0.72);}
+
 .alumni-intro{
   background:linear-gradient(145deg,var(--peach-light),#fdf6f0);
   border:1px solid rgba(245,196,168,0.55);

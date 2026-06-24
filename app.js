@@ -891,6 +891,20 @@ function isStandalone(){
   return window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
 }
 
+function initOrientationLock(){
+  const tryLock = () => {
+    const o = screen.orientation;
+    if(!o?.lock) return;
+    o.lock('portrait').catch(() => {});
+  };
+  tryLock();
+  document.addEventListener('visibilitychange', () => {
+    if(document.visibilityState === 'visible') tryLock();
+  });
+  window.addEventListener('orientationchange', tryLock);
+  document.body.addEventListener('pointerdown', tryLock, { once: true, passive: true });
+}
+
 function isIOS(){
   return /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
 }
@@ -1398,6 +1412,7 @@ function bootApp(){
   bindActions();
   bindJournalLock();
   initLastSeen();
+  initOrientationLock();
 
   if(!privacyAccepted()){
     showPrivacyNotice(false);
